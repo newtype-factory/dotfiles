@@ -1,0 +1,54 @@
+# スタート画面でメッセージ非表示
+startup_message off
+# エスケープをC-tに設定
+escape ^Tt
+# 文字コードの設定
+defutf8 on
+defencoding utf8
+encoding utf-8 utf-8
+# ハングアップした場合自動的にデタッチ
+autodetach on
+# 背景色消去
+defbce on
+# 256色表示設定
+attrcolor b ".I"
+term xterm-256color
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+# 可視ベルOFF
+vbell off
+# スクロールバッファ数
+defscrollback 10000
+# 画面のリフレッシュ
+altscreen on
+# 新しいウィンドウを開いたときのカレントディレクトリ
+chdir ~/
+# 行の折り返しを設定
+defwrap on
+
+# ステータスラインの表示設定
+# %H   ホスト名
+# %`  『Substitute with the output of a 'backtick' command.』
+# %-w  現在のウインドウより前のwindow番号とwindow名
+# %n   現在のwindow番号
+# %t   現在のwindow名
+# %+w  現在のウインドウより後のwindow番号とwindow名
+# %{=b bw} 色設定(例:初期化 bold blue white)
+#   継承設定      =:初期化 / .:以前の設定引継
+#   文字の設定    d:暗 / b:太字 / u:下線 / r:反転 / s:強調 / B:点滅
+#   背景色の設定  k:黒 / r:赤 / g:緑 / y:黄 / b:青 / m:マゼンダ / c:シアン / w:白 / d:標準
+#   文字色の設定  (同上)
+#   ※色は大文字にすると明るい色になる
+# %{-} 色クリア
+# %Y   年(4桁)
+# %m   月
+# %d   日
+# %02c 24時間表示の時刻
+# %s   秒
+hardstatus alwayslastline '%{= KW}%H %L=%-w%45L>%{=u rW}%n %t%{-}%+w %-19<%=%Y/%m/%d %02c:%s %-17<%=(%l)'
+
+# 参考に。。。
+#caption always '%?%F%{= YW}%:%{= MW}%?%2n%f%07=%t%='
+#caption always "%{= wk} %-w%{=bu dr}%n %t%{-}%+w %= %{=b wb}%y/%m/%d %{=b wb}%c"
+#hardstatus alwayslastline '%{= Kw}%H %L=%-w%45L>%{=u b.}%n %t%{-}%+w %-17<%=%m/%d %02c:%s'
+#hardstatus alwayslastline '%m/%d %02c:%s %{= .g}%H%{-} %L=%-w%45L>%{=u g.}%n %t%{-}%+w %-17<%=%{= .y}(%l)'
+#hardstatus alwayslastline "%{= gk}[%m/%d %02c:%s] %{gW} %-w%{= wk}%n %t%{-}%+w %=%{gk}$USER@$HOSTNAME[$LANG] (%l) "
