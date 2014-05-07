@@ -1,48 +1,3 @@
-# PROMPT表示
-PS1="[${USER}@${HOST%%.*} %1~]%(!.#.$) "
-
-#autoload -Uz vcs_info
-#zstyle ':vcs_info:*' formats '(%s)-[%b]'
-#zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
-#precmd () {
-#    psvar=()
-#    LANG=en_US.UTF-8 vcs_info
-#    [[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
-#}
-#RPROMPT="%1(v|%F{green}%1v%f|)"
-
-autoload -Uz VCS_INFO_get_data_git; VCS_INFO_get_data_git 2> /dev/null
-function rprompt-git-current-branch {
-  local name st color gitdir action
-  if [[ "$PWD" =~ '/¥.git(/.*)?$' ]]; then
-    return
-  fi
-  name=`git rev-parse --abbrev-ref=loose HEAD 2> /dev/null`
-  if [[ -z $name ]]; then
-    return
-  fi
-
-  gitdir=`git rev-parse --git-dir 2> /dev/null`
-  action=`VCS_INFO_git_getaction "$gitdir"` && action="($action)"
-
-  st=`git status 2> /dev/null`
-  if [[ -n `echo "$st" | grep "^nothing to"` ]]; then
-    color=%F{green}
-  elif [[ -n `echo "$st" | grep "^nothing added"` ]]; then
-    color=%F{yellow}
-  elif [[ -n `echo "$st" | grep "^# Untracked"` ]]; then
-    color=%B%F{red}
-  else
-     color=%F{red}
-  fi
-
-  echo "$color$name$action%f%b "
-}
-# プロンプトが表示されるたびにプロンプト文字列を評価、置換する
-setopt prompt_subst
-# 右端の表示
-RPROMPT='[`rprompt-git-current-branch`%~]'
-
 # 日本語環境
 export LANG=ja_JP.UTF-8
 
@@ -58,6 +13,8 @@ alias mv='mv -i'
 alias rm='rm -i'
 # find(sudoで隅々まで)
 alias find='sudo find'
+# historyのgrep
+alias hgrep='history -99999 | grep'
 
 autoload -U colors
 colors
@@ -98,17 +55,7 @@ export ZLS_COLORS=$LS_COLORS
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 if [ -f /etc/zsh_command_not_found ]; then
-    source /etc/zsh_command_not_found
-fi
-
-# source auto-fu.zsh
-if [ -f ~/.zsh/auto-fu.zsh ]; then
-    source ~/.zsh/auto-fu.zsh
-    function zle-line-init () {
-        auto-fu-init
-    }
-    zle -N zle-line-init
-    zstyle ':completion:*' completer _oldlist _complete
+  source /etc/zsh_command_not_found
 fi
 
 # 個別の依存ファイルの読み込み
