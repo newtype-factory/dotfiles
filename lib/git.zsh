@@ -66,7 +66,6 @@ function get_status() {
   if $(echo "${STATUS}" | grep '^\( D\|D\|AD\) ' &> /dev/null); then
     MESSAGE="${DELETED_MARK}${MESSAGE}"
   fi
-  echo $MESSAGE
   if [[ -n ${MESSAGE} ]]; then
     TXT_COLOR=$(get_branch_txt_color ${MESSAGE})
     MESSAGE="%F{${TXT_COLOR}}[%f${MESSAGE}%F{${TXT_COLOR}}]%f"
