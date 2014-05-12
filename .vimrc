@@ -38,7 +38,7 @@ NeoBundle 'vim-scripts/dbext.vim'
 filetype plugin indent on
 
 " 基本設定
-set syntax=on         " 構文の色分け
+syntax on              " 構文の色分け
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8,euc-jp,iso-2022-jp,ucs-2le,ucs-2,cp932
@@ -89,3 +89,8 @@ match WhitespaceEOL /\s\+$/
 autocmd WinEnter * match WhitespaceEOL /\s\+$/
 " 引数なしでvimを開いたらNERDTree起動
 autocmd vimenter * if !argc() | NERDTree | endif
+" インサートモードを抜けた時に色変更が遅れないようにする処理
+if has('unix') && !has('gui_running')
+  inoremap <silent> <Esc> <Esc>
+  inoremap <silent> <C-[> <Esc>
+endif
