@@ -11,6 +11,7 @@ source $ZSH/oh-my-zsh.sh
 
 # viキーバインド
 bindkey -v
+bindkey "" history-incremental-search-backward
 
 # prompt設定
 setopt prompt_subst
