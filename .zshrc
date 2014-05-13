@@ -42,7 +42,7 @@ function get_space() {
   echo $SPACES
 }
 function update_prompt() {
-  local MODE=0 MODE_STR='' PROMPT_STR='' RPROMPT_STR='' STATUS='' GIT_STR='' SPACE=''
+  local MODE=0 MODE_STR='' PROMPT_STR='' RPROMPT_STR='' HDD='' MEMORY_INFO='' MEMORY='' STATUS='' GIT_STR='' SPACE=''
   local BRANCH_BG_COLOR=256 BRANCH_TXT_COLOR=256 # default(透過色)
   if [ $# -eq 1 ]; then
     MODE=$1
@@ -53,13 +53,17 @@ function update_prompt() {
     MODE_STR="%K{33}%F{241}${ARROW_MARK}%k%f%K{33}%F{15} INSERT %k%f%F{33}${ARROW_MARK}%f"
   fi
   PROMPT_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
+  HDD=$(df | head -2 | tail -1 | awk '{print $5}')
+  MEMORY_INFO=$(free -t | tail -1 | awk '{ print $2 " " $3 }')
+  MEMORY_INFO=${(z)MEMORY_INFO}
+  MEMORY=$(echo ${MEMORY_INFO[2]} ${MEMORY_INFO[1]} | awk '{printf("%d",$1/$2*100)}')
   if $(repository_check); then
     STATUS=$(get_status)
     BRANCH_BG_COLOR=$(get_branch_bg_color ${STATUS})
     BRANCH_TXT_COLOR=$(get_branch_txt_color ${STATUS})
     GIT_STR="%F{${BRANCH_BG_COLOR}}${RIGHT_ARROW_MARK}%f%K{${BRANCH_BG_COLOR}}%F{${BRANCH_TXT_COLOR}} ${BRANCH_MARK} $(get_branch_name)${STATUS} %B$(git_dirty_check) %b%k%f"
   fi
-  RPROMPT_STR="${GIT_STR}%K{${BRANCH_BG_COLOR}}%F{15}${RIGHT_ARROW_MARK}%k%f%K{15}%F{0}%B %T %k%f%b » "
+  RPROMPT_STR="%F{45}HDD%f:${HDD} ％ %F{200}MEMORY%f:${MEMORY}％ ${GIT_STR}%K{${BRANCH_BG_COLOR}}%F{15}${RIGHT_ARROW_MARK}%k%f%K{15}%F{0}%B %T %k%f%b » "
   SPACE=$(get_space ${PROMPT_STR} ${RPROMPT_STR})
   PROMPT=${PROMPT_STR}${SPACE}${RPROMPT_STR}
 }
@@ -116,19 +120,24 @@ function lll() {
     ll **/* | less -R
   fi
 }
-# 色
+
+# 色設定
 autoload -U colors && colors
 # 強力な補完機能
 autoload -U compinit
 compinit -u
-# コマンド訂正機能
-# setopt correct
+# ツンデレ補正
+setopt CORRECT
+SPROMPT="%{${fg[yellow]}%}%rじゃないの？べ、別にあんたのために修正したんじゃないからね！%{${reset_color}%}
+[%rを実行(y),%Rを実行(n),編集(e),却下(a)]:"
 # リストを詰めて表示
-setopt list_packed
+setopt LIST_PACKED
 # 補完一覧ファイル種別表示
-setopt list_types
-# 補完候補を矢印キーなどで選択
-zstyle ':completion:*:default' menu select
+setopt LIST_TYPES
+# 補完候補表示
+setopt AUTO_LIST
+# = 以降も補完 (--prefix=/usr)
+setopt MAGIC_EQUAL_SUBST
 # historyファイル
 HISTFILE=~/.zsh_history
 # ファイルサイズ
@@ -136,21 +145,21 @@ HISTSIZE=99999
 # saveする量
 SAVEHIST=99999
 # 重複を記録しない
-setopt hist_ignore_dups
+setopt HIST_IGNORE_DUPS
 # スペース排除
-setopt hist_reduce_blanks
+setopt HIST_REDUCE_BLANKS
 # 履歴ファイルを共有
-setopt share_history
+setopt SHARE_HISTORY
 # zshの開始終了を記録
 setopt EXTENDED_HISTORY
-# 補完候補表示
-setopt auto_list
-# 補完候補の種類分け
-setopt list_types
+# ビープOFF
+setopt NOBEEP
 
 # 補完候補の色づけ
 eval `dircolors`
 export ZLS_COLORS=$LS_COLORS
+# 補完候補を矢印キーなどで選択
+zstyle ':completion:*:default' menu select
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 # 補完候補をキャッシュ
 zstyle ':completion:*' use-cache true
