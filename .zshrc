@@ -17,46 +17,48 @@ bindkey "" history-incremental-search-backward
 setopt prompt_subst
 setopt prompt_percent
 source $HOME/dotfiles/lib/git.zsh
-MODE_NORMAL_STR="%K{164}%F{241}"$ARROW_MARK"%k%f%K{164}%F{15} NORMAL %k%f%F{164}"$ARROW_MARK"%f"
-MODE_INSERT_STR="%K{33}%F{241}"$ARROW_MARK"%k%f%K{33}%F{15} INSERT %k%f%F{33}"$ARROW_MARK"%f"
 function get_space() {
-  local HOME_DIR='' STR='' LENGTH=0 WIDTH=0 SPACES=''
-  HOME_DIR=$(cd && pwd)
+  local USER_NAME='' HOME_DIR='' STR='' LENGTH=0 WIDTH=0 SPACES=''
   STR=$(echo $1$2 | sed -e 's/%[KF]{[0-9]\+}//g' | sed -e 's/%[kfBb]//g')
-  STR=$STR$(pwd | sed -e "s#${HOME_DIR}#~#" | sed -e 's#/.oh-my-zsh#ZSH#')
-  LENGTH=$#STR
-  WIDTH=${COLUMNS}
-  (( LENGTH = ${WIDTH} - ${LENGTH} - 1))
+  if [ $(echo $STR | grep -c '%n') ]; then
+    USER_NAME=$(whoami)
+    STR=$(echo $STR | sed -e "s/%n/${USER_NAME}/g")
+  fi
+  if [ $(echo $STR | grep -c '%~') ]; then
+    HOME_DIR=$(cd && pwd)
+    STR=$(echo $STR | sed -e 's/%~//g')$(pwd | sed -e "s#${HOME_DIR}#~#" | sed -e "s#~/.oh-my-zsh#~ZSH#")
+    #STR=$(echo $STR | sed -e 's/%~//g')$(pwd | sed -e "s#${HOME_DIR}#~#")
+  fi
+  (( LENGTH = $COLUMNS - $#STR - 1 ))
   for i in {0..$LENGTH}
     do
-      SPACES="$SPACES "
+      SPACES="${SPACES} "
     done
   echo $SPACES
 }
 function update_prompt() {
-  local NORMAL_MODE=0 MODE='' PROMPT_STR='' RPROMPT_STR='' GIT_STR='' SPACE=''
-  local BRANCH_BG_COLOR=256 # default(透過色)
-  local BRANCH_TXT_COLOR=256 # default(透過色)
+  local MODE=0 MODE_STR='' PROMPT_STR='' RPROMPT_STR='' STATUS='' GIT_STR='' SPACE=''
+  local BRANCH_BG_COLOR=256 BRANCH_TXT_COLOR=256 # default(透過色)
   if [ $# -eq 1 ]; then
-    NORMAL_MODE=$1
+    MODE=$1
   fi
-  if [ ${NORMAL_MODE} -eq 1 ]; then
-    MODE=${MODE_NORMAL_STR}
+  if [ $MODE -eq 1 ]; then
+    MODE_STR="%K{164}%F{241}${ARROW_MARK}%k%f%K{164}%F{15} NORMAL %k%f%F{164}${ARROW_MARK}%f"
   else
-    MODE=${MODE_INSERT_STR}
+    MODE_STR="%K{33}%F{241}${ARROW_MARK}%k%f%K{33}%F{15} INSERT %k%f%F{33}${ARROW_MARK}%f"
   fi
-  PROMPT_STR="%K{190}%F{2} %n %k%f%K{241}%F{190}"$ARROW_MARK"%k%f%K{241}%F{15}%  %~ %k%f"${MODE}
+  PROMPT_STR="%K{190}%F{2} %n %k%f%K{241}%F{190}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
   if $(repository_check); then
-
     STATUS=$(get_status)
     BRANCH_BG_COLOR=$(get_branch_bg_color ${STATUS})
     BRANCH_TXT_COLOR=$(get_branch_txt_color ${STATUS})
-    GIT_STR="%F{${BRANCH_BG_COLOR}}"$RIGHT_ARROW_MARK"%f%K{${BRANCH_BG_COLOR}}%F{${BRANCH_TXT_COLOR}} ${BRANCH_MARK} $(get_branch_name)%f${STATUS}%F{${BRANCH_TXT_COLOR}} %B$(git_dirty_check) %b%k%f"
+    GIT_STR="%F{${BRANCH_BG_COLOR}}${RIGHT_ARROW_MARK}%f%K{${BRANCH_BG_COLOR}}%F{${BRANCH_TXT_COLOR}} ${BRANCH_MARK} $(get_branch_name)${STATUS} %B$(git_dirty_check) %b%k%f"
   fi
-  RPROMPT_STR=${GIT_STR}"%K{${BRANCH_BG_COLOR}}%F{15}"$RIGHT_ARROW_MARK"%k%f%K{15}%F{0}%B %T %k%f%b » "
+  RPROMPT_STR="${GIT_STR}%K{${BRANCH_BG_COLOR}}%F{15}${RIGHT_ARROW_MARK}%k%f%K{15}%F{0}%B %T %k%f%b » "
   SPACE=$(get_space ${PROMPT_STR} ${RPROMPT_STR})
   PROMPT=${PROMPT_STR}${SPACE}${RPROMPT_STR}
 }
+autoload -Uz add-zsh-hook
 add-zsh-hook precmd update_prompt
 
 # vimode表示

@@ -49,68 +49,45 @@ function git_dirty_check() {
 
 # status check
 function get_status() {
-  local STATUS='' MESSAGE=''
-  STATUS=$(command git status -s --porcelain 2> /dev/null)
-  if $(echo "${STATUS}" | grep -E '^\?\? ' &> /dev/null); then
-    MESSAGE="${UNTRACKED_MARK}${MESSAGE}"
-  fi
-  if $(echo "${STATUS}" | grep '^\(A\|M\) ' &> /dev/null); then
-    MESSAGE="${ADDED_MARK}${MESSAGE}"
-  fi
-  if $(echo "${STATUS}" | grep '^\( M\|AM\| T\) ' &> /dev/null); then
-    MESSAGE="${MODIFIED_MARK}${MESSAGE}"
-  fi
-  if $(echo "${STATUS}" | grep '^R ' &> /dev/null); then
-    MESSAGE="${RENAMED_MARK}${MESSAGE}"
-  fi
-  if $(echo "${STATUS}" | grep '^\( D\|D\|AD\) ' &> /dev/null); then
-    MESSAGE="${DELETED_MARK}${MESSAGE}"
-  fi
-  if [[ -n ${MESSAGE} ]]; then
-    TXT_COLOR=$(get_branch_txt_color ${MESSAGE})
-    MESSAGE="%F{${TXT_COLOR}}[%f${MESSAGE}%F{${TXT_COLOR}}]%f"
-  fi
-  echo $MESSAGE
+  local STATUS='' STAGE_COUNT=0 UPDATE_COUNT=0
+  STATUS=$(git status -s --porcelain 2> /dev/null)
+  STAGE_COUNT=$(echo "${STATUS}" | grep '^\(A\|M\|AM\|MM\) ' | wc -l)
+  UPDATE_COUNT=$(echo "${STATUS}" | grep '^\(??\| M\|MM\|AM\| T\|R\| D\|D\|AD\) ' | wc -l)
+  echo "[S:${STAGE_COUNT} M:${UPDATE_COUNT}]"
 }
 
 # bg color
 function get_branch_bg_color() {
+  local LIST ARRAY GREEN_COLOR=2 YELLOW_COLOR=220 RED_COLOR=1
   if [ $# -eq 1 ]; then
-    if $(echo "$1" | grep "${UNTRACKED_MARK}" &> /dev/null); then
-      echo 1;
-    elif $(echo "$1" | grep "${ADDED_MARK}" &> /dev/null); then
-      echo 220;
-    elif $(echo "$1" | grep "${MODIFIED_MARK}" &> /dev/null); then
-      echo 220;
-    elif $(echo "$1" | grep "${RENAMED_MARK}" &> /dev/null); then
-      echo 220;
-    elif $(echo "$1" | grep "${DELETED_MARK}" &> /dev/null); then
-      echo 220;
+    LIST=$(echo $1 | sed -e 's/\[S:\([0-9]\+\) M:\([0-9]\+\)\]/\1 \2/')
+    ARRAY=${(z)LIST}
+    if [ ${ARRAY[1]} -gt 0 ]; then
+      echo $YELLOW_COLOR
+    elif [ ${ARRAY[2]} -gt 0 ]; then
+      echo $RED_COLOR
     else
-      echo 2;
+      echo $GREEN_COLOR
     fi
   else
-    echo 2;
+    echo $GREEN_COLOR
   fi
 }
 
-# text color
+# text color2
 function get_branch_txt_color() {
+  local LIST ARRAY WHITE_COLOR=15 RED_COLOR=160 YELLOW_COLOR=226
   if [ $# -eq 1 ]; then
-    if $(echo "$1" | grep "${UNTRACKED_MARK}" &> /dev/null); then
-      echo 226;
-    elif $(echo "$1" | grep "${ADDED_MARK}" &> /dev/null); then
-      echo 160;
-    elif $(echo "$1" | grep "${MODIFIED_MARK}" &> /dev/null); then
-      echo 160;
-    elif $(echo "$1" | grep "${RENAMED_MARK}" &> /dev/null); then
-      echo 160;
-    elif $(echo "$1" | grep "${DELETED_MARK}" &> /dev/null); then
-      echo 160;
+    LIST=$(echo $1 | sed -e 's/\[S:\([0-9]\+\) M:\([0-9]\+\)\]/\1 \2/')
+    ARRAY=${(z)LIST}
+    if [ ${ARRAY[1]} -gt 0 ]; then
+      echo $RED_COLOR
+    elif [ ${ARRAY[2]} -gt 0 ]; then
+      echo $YELLOW_COLOR
     else
-      echo 15;
+      echo $WHITE_COLOR
     fi
   else
-    echo 15;
+    echo $WHITE_COLOR
   fi
 }
