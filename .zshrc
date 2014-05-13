@@ -1,3 +1,5 @@
+# zshrc setting
+
 # 日本語環境
 export LANG=ja_JP.UTF-8
 # ターミナル256色設定
@@ -20,6 +22,10 @@ source $HOME/dotfiles/lib/git.zsh
 function get_space() {
   local USER_NAME='' HOME_DIR='' STR='' LENGTH=0 WIDTH=0 SPACES=''
   STR=$(echo $1$2 | sed -e 's/%[KF]{[0-9]\+}//g' | sed -e 's/%[kfBb]//g')
+  if [ $(echo $STR | grep -c '%m') ]; then
+    HOST_NAME=$(hostname -s)
+    STR=$(echo $STR | sed -e "s/%m/${HOST_NAME}/g")
+  fi
   if [ $(echo $STR | grep -c '%n') ]; then
     USER_NAME=$(whoami)
     STR=$(echo $STR | sed -e "s/%n/${USER_NAME}/g")
@@ -27,7 +33,6 @@ function get_space() {
   if [ $(echo $STR | grep -c '%~') ]; then
     HOME_DIR=$(cd && pwd)
     STR=$(echo $STR | sed -e 's/%~//g')$(pwd | sed -e "s#${HOME_DIR}#~#" | sed -e "s#~/.oh-my-zsh#~ZSH#")
-    #STR=$(echo $STR | sed -e 's/%~//g')$(pwd | sed -e "s#${HOME_DIR}#~#")
   fi
   (( LENGTH = $COLUMNS - $#STR - 1 ))
   for i in {0..$LENGTH}
@@ -47,7 +52,7 @@ function update_prompt() {
   else
     MODE_STR="%K{33}%F{241}${ARROW_MARK}%k%f%K{33}%F{15} INSERT %k%f%F{33}${ARROW_MARK}%f"
   fi
-  PROMPT_STR="%K{190}%F{2} %n %k%f%K{241}%F{190}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
+  PROMPT_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
   if $(repository_check); then
     STATUS=$(get_status)
     BRANCH_BG_COLOR=$(get_branch_bg_color ${STATUS})

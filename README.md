@@ -8,10 +8,10 @@ zsh(+oh-my-zsh),screen,vimの環境構築用
 $ cd
 $ git clone https://github.com/newtype-factory/dotfiles
 $ cd dotfiles
-$ ./symlink.sh
-$ ./vim-neobundle.sh
-$ ./vim-colorscheme.sh
-$ ./oh-my-zsh.sh
+$ ./lib/symlink.sh
+$ ./lib/vim-neobundle.sh
+$ ./lib/vim-colorscheme.sh
+$ ./lib/oh-my-zsh.sh
 $ cp .zshrc_local.sample ~/.zshrc_local
 ```
 
