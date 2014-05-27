@@ -35,11 +35,16 @@ function get_space() {
     STR=$(echo $STR | sed -e 's/%~//g')$(pwd | sed -e "s#${HOME_DIR}#~#" | sed -e "s#~/.oh-my-zsh#~ZSH#")
   fi
   (( LENGTH = $COLUMNS - $#STR - 1 ))
-  for i in {0..$LENGTH}
+  if [ $LENGTH -gt 0 ]; then
+    for i in {0..$LENGTH}
     do
       SPACES="${SPACES} "
     done
-  echo $SPACES
+    echo $SPACES
+    return 0
+  else
+    return 1
+  fi
 }
 function update_prompt() {
   local MODE=0 MODE_STR='' PROMPT_STR='' RPROMPT_STR='' HDD='' MEMORY_INFO='' MEMORY='' STATUS='' GIT_STR='' SPACE=''
@@ -53,6 +58,7 @@ function update_prompt() {
     MODE_STR="%K{33}%F{241}${ARROW_MARK}%k%f%K{33}%F{15} INSERT %k%f%F{33}${ARROW_MARK}%f"
   fi
   PROMPT_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
+  PROMPT2_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %C %k%f${MODE_STR}"
   HDD=$(df | head -2 | tail -1 | awk '{print $5}')
   MEMORY_INFO=$(free -t | tail -1 | awk '{ print $2 " " $3 }')
   MEMORY_INFO=${(z)MEMORY_INFO}
@@ -62,10 +68,17 @@ function update_prompt() {
     BRANCH_BG_COLOR=$(get_branch_bg_color ${STATUS})
     BRANCH_TXT_COLOR=$(get_branch_txt_color ${STATUS})
     GIT_STR="%F{${BRANCH_BG_COLOR}}${RIGHT_ARROW_MARK}%f%K{${BRANCH_BG_COLOR}}%F{${BRANCH_TXT_COLOR}} ${BRANCH_MARK} $(get_branch_name)${STATUS} %B$(git_dirty_check) %b%k%f"
+    GIT2_STR=" %F{${BRANCH_BG_COLOR}}$(get_branch_name)%f ${STATUS}"
   fi
   RPROMPT_STR="%F{45}HDD%f:${HDD} ％ %F{200}MEMORY%f:${MEMORY}％ ${GIT_STR}%K{${BRANCH_BG_COLOR}}%F{15}${RIGHT_ARROW_MARK}%k%f%K{15}%F{0}%B %T %k%f%b » "
+  RPROMPT2_STR="${GIT2_STR}
+ » "
   SPACE=$(get_space ${PROMPT_STR} ${RPROMPT_STR})
-  PROMPT=${PROMPT_STR}${SPACE}${RPROMPT_STR}
+  if [ $? -eq 1 ]; then
+    PROMPT=${PROMPT_STR}${RPROMPT2_STR}
+  else
+    PROMPT=${PROMPT_STR}${SPACE}${RPROMPT_STR}
+  fi
 }
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd update_prompt
