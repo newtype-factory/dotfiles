@@ -60,6 +60,9 @@ function update_prompt() {
   PROMPT_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
   PROMPT2_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %C %k%f${MODE_STR}"
   HDD=$(df | head -2 | tail -1 | awk '{print $5}')
+  if [ -z $HDD ]; then
+    HDD=$(df 2>/dev/null | head -3 | tail -1 | awk '{print $4}')
+  fi
   MEMORY_INFO=$(free -t | tail -1 | awk '{ print $2 " " $3 }')
   MEMORY_INFO=${(z)MEMORY_INFO}
   MEMORY=$(echo ${MEMORY_INFO[2]} ${MEMORY_INFO[1]} | awk '{printf("%d",$1/$2*100)}')
@@ -112,7 +115,7 @@ alias find='sudo find'
 # historyのgrep
 function hgrep() {
   if [ $# -eq 1 ]; then
-    history 99999 | sort -k 2 | uniq -f 2 | sort | grep --color=always -i $1 | less -R
+    history 99999 | sort -k 2 | uniq -f 2 | sort | grep --color=always -i $1
   else
     echo '\e[4;31;49m[ERROR]\e[m検索する文字列を入れてください。'
   fi
@@ -120,7 +123,7 @@ function hgrep() {
 # psのgrep
 function psgrep() {
   if [ $# -eq 1 ]; then
-    ps aux | grep --color=always -i $1 | less -R
+    ps aux | grep --color=always -i $1
   else
     echo '\e[4;31;49m[ERROR]\e[m検索する文字列を入れてください。'
   fi
@@ -128,9 +131,9 @@ function psgrep() {
 # llの再帰的表示
 function lll() {
   if [ $# -eq 1 ]; then
-    ll **/* | grep --color=always -i $1 | less -R
+    ll **/* | grep --color=always -i $1
   else
-    ll **/* | less -R
+    ll **/*
   fi
 }
 
