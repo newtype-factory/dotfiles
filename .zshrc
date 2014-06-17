@@ -59,7 +59,7 @@ function update_prompt() {
   fi
   PROMPT_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
   PROMPT2_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %C %k%f${MODE_STR}"
-  HDD=$(df | head -2 | tail -1 | awk '{print $5}')
+  HDD=$(df 2>/dev/null | head -2 | tail -1 | awk '{print $5}')
   if [ -z $HDD ]; then
     HDD=$(df 2>/dev/null | head -3 | tail -1 | awk '{print $4}')
   fi
