@@ -57,8 +57,8 @@ function update_prompt() {
   else
     MODE_STR="%K{33}%F{241}${ARROW_MARK}%k%f%K{33}%F{15} INSERT %k%f%F{33}${ARROW_MARK}%f"
   fi
-  PROMPT_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
-  PROMPT2_STR="%K{202}%F{190} %m%f%F{1}@%f%F{190}%n %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %C %k%f${MODE_STR}"
+  PROMPT_STR="%K{202}%F{190} %n%f%F{1}@%f%F{190}%m %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
+  PROMPT2_STR="%K{202}%F{190} %n%f%F{1}@%f%F{190}%m %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %C %k%f${MODE_STR}"
   HDD=$(df 2>/dev/null | head -2 | tail -1 | awk '{print $5}')
   if [ -z $HDD ]; then
     HDD=$(df 2>/dev/null | head -3 | tail -1 | awk '{print $4}')
@@ -190,7 +190,7 @@ if [ ${STY} ]; then
     echo -ne "\ek${1%% *}\e\\"
   }
   precmd() {
-    echo -ne "\ek$(hostname)\e\\"
+    echo -ne "\ek$(hostname|awk 'BEGIN{FS="."}{print $1}')\e\\"
   }
 fi
 
