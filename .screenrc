@@ -24,6 +24,8 @@ altscreen on
 chdir ~/
 # 行の折り返しを設定
 defwrap on
+# 色設定
+sorendition "+rb WB"
 # デフォルトのウィンドウ名
 shelltitle "$ |$HOSTNAME"
 
