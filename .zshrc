@@ -184,6 +184,16 @@ zstyle ':completion:*' list-separator '-->'
 # 詳細な情報を使う
 zstyle ':completion:*' verbose yes
 
+# screenのウィンドウへ実行コマンドを表示
+if [ ${STY} ]; then
+  preexec() {
+    echo -ne "\ek${1%% *}\e\\"
+  }
+  precmd() {
+    echo -ne "\ek$(hostname)\e\\"
+  }
+fi
+
 # コマンドがインストールされていなかった場合の設定
 [ -f /etc/zsh_command_not_found ] && source /etc/zsh_command_not_found
 # 個別の依存ファイルの読み込み

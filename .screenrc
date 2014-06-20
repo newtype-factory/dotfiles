@@ -24,6 +24,8 @@ altscreen on
 chdir ~/
 # 行の折り返しを設定
 defwrap on
+# デフォルトのウィンドウ名
+shelltitle "$ |$HOSTNAME"
 
 # ステータスラインの表示設定
 # %H   ホスト名
