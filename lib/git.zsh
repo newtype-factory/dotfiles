@@ -1,14 +1,14 @@
 # フォント特有の記号
-BRANCH_MARK=$'\ue0a0'$'\ua0'
-LN_MARK=$'\ue0a1'$'\ua0'
-KEY_MARK=$'\ue0a2'$'\ua0'
-ARROW_MARK=$'\ue0b0'$'\ua0'
-ARROW2_MARK=$'\ue0b1'$'\ua0'
-RIGHT_ARROW_MARK=$'\ue0b2'
-RIGHT_ARROW2_MARK=$'\ue0b3'
+BRANCH_MARK=$'\xee\x82\xa0\xc2\xa0'
+LN_MARK=$'\xee\x82\xa1\xc2\xa0'
+KEY_MARK=$'\xee\x82\xa2\xc2\xa0'
+ARROW_MARK=$'\xee\x82\xb0\xc2\xa0'
+ARROW2_MARK=$'\xee\x82\xb1\xc2\xa0'
+RIGHT_ARROW_MARK=$'\xee\x82\xb2'
+RIGHT_ARROW2_MARK=$'\xee\x82\xb2'
 
-CLEAN_MARK='%F{202}'$'\u2600''%f'
-DIRTY_MARK='%F{33}'$'\u2602''%f'
+CLEAN_MARK='%F{202}'$'\xe2\x98\x80''%f'
+DIRTY_MARK='%F{33}'$'\xe2\x98\x82''%f'
 
 UNTRACKED_MARK='%F{226}✭%f'
 ADDED_MARK='%F{10}✚%f'

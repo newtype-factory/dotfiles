@@ -21,20 +21,20 @@ setopt prompt_percent
 source $HOME/dotfiles/lib/git.zsh
 function get_space() {
   local USER_NAME='' HOME_DIR='' STR='' LENGTH=0 WIDTH=0 SPACES=''
-  STR=$(echo $1$2 | sed -e 's/%[KF]{[0-9]\+}//g' | sed -e 's/%[kfBb]//g')
+  STR=$(echo -n $1$2 | sed -e "s/\(${ARROW_MARK}\|${BRANCH_MARK}\|％\)/xx/g" | sed -e "s/\(${RIGHT_ARROW_MARK}\|${CLEAN_MARK}\|${DIRTY_MARK}\)/x/g" | sed -e 's/%[KF]{[0-9]\+}//g' | sed -e 's/%[kfBb]//g')
   if [ $(echo $STR | grep -c '%m') ]; then
     HOST_NAME=$(hostname -s)
-    STR=$(echo $STR | sed -e "s/%m/${HOST_NAME}/g")
+    STR=$(echo -n $STR | sed -e "s/%m/${HOST_NAME}/g")
   fi
   if [ $(echo $STR | grep -c '%n') ]; then
     USER_NAME=$(whoami)
-    STR=$(echo $STR | sed -e "s/%n/${USER_NAME}/g")
+    STR=$(echo -n $STR | sed -e "s/%n/${USER_NAME}/g")
   fi
-  if [ $(echo $STR | grep -c '%~') ]; then
-    HOME_DIR=$(cd && pwd)
-    STR=$(echo $STR | sed -e 's/%~//g')$(pwd | sed -e "s#${HOME_DIR}#~#" | sed -e "s#~/.oh-my-zsh#~ZSH#")
+  if [ $(echo $STR | grep -c '%d') ]; then
+    PWD=$(pwd)
+    STR=$(echo -n $STR | sed -e "s#%d#${PWD}#g")
   fi
-  (( LENGTH = $COLUMNS - $#STR - 1 ))
+  (( LENGTH = $COLUMNS - $#STR - 2 ))
   if [ $LENGTH -gt 0 ]; then
     for i in {0..$LENGTH}
     do
@@ -57,7 +57,13 @@ function update_prompt() {
   else
     MODE_STR="%K{33}%F{241}${ARROW_MARK}%k%f%K{33}%F{15} INSERT %k%f%F{33}${ARROW_MARK}%f"
   fi
-  PROMPT_STR="%K{202}%F{190} %n%f%F{1}@%f%F{190}%m %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %~ %k%f${MODE_STR}"
+  HOME_DIR=$(cd && pwd)
+  if [ $(pwd | grep -c "^${HOME_DIR}") ]; then
+    CURRENT=$(pwd | sed -e "s#${HOME_DIR}#~#g")
+  else
+    CURRENT=$PWD
+  fi
+  PROMPT_STR="%K{202}%F{190} %n%f%F{1}@%f%F{190}%m %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} ${CURRENT} %k%f${MODE_STR}"
   PROMPT2_STR="%K{202}%F{190} %n%f%F{1}@%f%F{190}%m %k%f%K{241}%F{202}${ARROW_MARK}%k%f%K{241}%F{15} %C %k%f${MODE_STR}"
   HDD=$(df 2>/dev/null | head -2 | tail -1 | awk '{print $5}')
   if [ -z $HDD ]; then
@@ -73,14 +79,14 @@ function update_prompt() {
     GIT_STR="%F{${BRANCH_BG_COLOR}}${RIGHT_ARROW_MARK}%f%K{${BRANCH_BG_COLOR}}%F{${BRANCH_TXT_COLOR}} ${BRANCH_MARK} $(get_branch_name)${STATUS} %B$(git_dirty_check) %b%k%f"
     GIT2_STR=" %F{${BRANCH_BG_COLOR}}$(get_branch_name)%f ${STATUS}"
   fi
-  RPROMPT_STR="%F{45}HDD%f:${HDD} ％ %F{200}MEMORY%f:${MEMORY}％ ${GIT_STR}%K{${BRANCH_BG_COLOR}}%F{15}${RIGHT_ARROW_MARK}%k%f%K{15}%F{0}%B %T %k%f%b » "
+  RPROMPT_STR="%F{45}HDD%f:${HDD} ％ %F{200}MEMORY%f:${MEMORY}％ ${GIT_STR}%K{${BRANCH_BG_COLOR}}%F{15}${RIGHT_ARROW_MARK}%k%f%K{15}%F{0}%B %T %k%f%b"
   RPROMPT2_STR="${GIT2_STR}
  » "
   SPACE=$(get_space ${PROMPT_STR} ${RPROMPT_STR})
   if [ $? -eq 1 ]; then
     PROMPT=${PROMPT_STR}${RPROMPT2_STR}
   else
-    PROMPT=${PROMPT_STR}${SPACE}${RPROMPT_STR}
+    PROMPT="${PROMPT_STR}${SPACE}${RPROMPT_STR} » "
   fi
 }
 autoload -Uz add-zsh-hook
