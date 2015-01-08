@@ -6,8 +6,8 @@ filetype off
 filetype plugin indent off
 if has('vim_starting')
   set runtimepath+=~/.vim/bundle/neobundle.vim
-  call neobundle#rc(expand('~/.vim/bundle/'))
 endif
+call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundle 'Shougo/neobundle.vim'
 NeoBundle 'Lokaltog/powerline', { 'rtp': 'powerline/bindings/vim' }
 NeoBundle 'thinca/vim-quickrun'
@@ -35,6 +35,7 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-rails'
 NeoBundle 'thinca/vim-ref'
 NeoBundle 'vim-scripts/dbext.vim'
+call neobundle#end()
 filetype plugin indent on
 
 " 基本設定
