@@ -137,9 +137,9 @@ function psgrep() {
 # llの再帰的表示
 function lll() {
   if [ $# -eq 1 ]; then
-    ll **/* | grep --color=always -i $1
+    ls -ladh **/*$1* | grep --color=always $1
   else
-    ll **/*
+    ls -ladh **/*
   fi
 }
 
