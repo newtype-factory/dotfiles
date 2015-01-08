@@ -143,6 +143,26 @@ function lll() {
   fi
 }
 
+function randno() {
+  if [ $# -eq 1 ]; then
+    no=""
+    for i in `seq 1 40`
+    do
+      result=`cat /dev/urandom | tr -dc '[:digit:]' | head -c $1`
+      if [ $(($i % 8)) -eq 0 ]; then
+        no="${no} ${result}\n"
+      elif [ $(($i % 8)) -eq 1 ]; then
+        no="${no}${result}"
+      else
+        no="${no} ${result}"
+      fi
+    done
+    echo $no
+  else
+    echo '\e[4;31;49m[ERROR]\e[m生成したい数値の長さを入力してください。'
+  fi
+}
+
 # 色設定
 autoload -U colors && colors
 # 強力な補完機能
